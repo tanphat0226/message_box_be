@@ -2,7 +2,8 @@ import { messageService } from '../services/messageServices.js'
 
 const getAllMessages = async (req, res) => {
   try {
-    const messages = await messageService.getAllMessages()
+    const userId = req.user.id
+    const messages = await messageService.getAllMessages(userId)
     res.json(messages)
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -22,7 +23,8 @@ const getMessageById = async (req, res) => {
 
 const getRandomMessage = async (req, res) => {
   try {
-    const randomMessage = await messageService.getRandomMessage()
+    const userId = req.user.id
+    const randomMessage = await messageService.getRandomMessage(userId)
     res.json(randomMessage)
   } catch (err) {
     res.status(500).json({ error: err.message })

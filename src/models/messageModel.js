@@ -5,9 +5,12 @@ const checkUserExists = async (userId) => {
   return result.rowCount > 0 // Trả về true nếu user tồn tại
 }
 
-const getAllMessages = async () => {
+const getAllMessages = async (userId) => {
   try {
-    const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC')
+    const result = await pool.query(
+      'SELECT * FROM messages WHERE user_id = $1 ORDER BY created_at DESC',
+      [userId]
+    )
     return result.rows
   } catch (error) {
     throw new Error('Error retrieving all messages: ' + error.message)
@@ -23,9 +26,12 @@ const getMessageById = async (id) => {
   }
 }
 
-const getRandomMessage = async () => {
+const getRandomMessage = async (userId) => {
   try {
-    const result = await pool.query('SELECT * FROM messages ORDER BY RANDOM() LIMIT 1')
+    const result = await pool.query(
+      'SELECT * FROM messages WHERE user_id = $1 ORDER BY RANDOM() LIMIT 1',
+      [userId]
+    )
     return result
   } catch (error) {
     throw new Error('Error retrieving random message: ' + error.message)

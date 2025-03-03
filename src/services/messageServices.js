@@ -1,8 +1,8 @@
 import { messageModel } from '../models/messageModel.js'
 
-const getAllMessages = async () => {
+const getAllMessages = async (userId) => {
   try {
-    const result = await messageModel.getAllMessages()
+    const result = await messageModel.getAllMessages(userId)
     return result
   } catch (error) {
     throw new Error('Failed to get all messages: ' + error.message)
@@ -18,9 +18,9 @@ const getMessageById = async (id) => {
   }
 }
 
-const getRandomMessage = async () => {
+const getRandomMessage = async (userId) => {
   try {
-    const result = await messageModel.getRandomMessage()
+    const result = await messageModel.getRandomMessage(userId)
     return result.rows[0]
   } catch (error) {
     throw new Error('Failed to get random message: ' + error.message)
