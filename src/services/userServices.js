@@ -35,9 +35,10 @@ const login = async (username, password) => {
     }
 
     // Create JWT Token
-    const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
       expiresIn: '1h'
     })
+    console.log('Login token:::', token)
 
     return { username: user.username, token }
   } catch (error) {

@@ -9,14 +9,13 @@ import cors from 'cors'
 
 const app = express()
 
-// Init Middleware
+// Xử lý CORS
+app.use(cors(corsOptions))
 
+// Init Middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: true })) // Parses URL-encoded bodies
 app.use(cookieParser())
-
-// Xử lý CORS
-app.use(cors(corsOptions))
 
 app.use(morgan('dev'))
 app.use(helmet())

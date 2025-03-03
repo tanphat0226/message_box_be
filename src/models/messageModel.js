@@ -1,8 +1,13 @@
 import pool from '../configs/db.js'
 
+const checkUserExists = async (userId) => {
+  const result = await pool.query('SELECT id FROM users WHERE id = $1', [userId])
+  return result.rowCount > 0 // Trả về true nếu user tồn tại
+}
+
 const getAllMessages = async () => {
   try {
-    const result = await pool.query('SELECT * FROM messages')
+    const result = await pool.query('SELECT * FROM messages ORDER BY created_at DESC')
     return result.rows
   } catch (error) {
     throw new Error('Error retrieving all messages: ' + error.message)
@@ -27,15 +32,32 @@ const getRandomMessage = async () => {
   }
 }
 
-const createMessage = async ({ content, tag }) => {
+const createMessage = async ({ content, author, userId }) => {
   try {
+    const userExists = await checkUserExists(userId)
+    if (!userExists) {
+      throw new Error(`User with ID ${userId} does not exist`)
+    }
+
     const result = await pool.query(
-      'INSERT INTO messages (content, tag) VALUES ($1, $2) RETURNING *',
-      [content, tag || null]
+      'INSERT INTO messages (user_id, author, content) VALUES ($1, $2, $3) RETURNING *',
+      [userId, author || null, content]
     )
     return result.rows[0]
   } catch (error) {
     throw new Error('Error creating message: ' + error.message)
+  }
+}
+
+const updateMessage = async ({ id, content, author }) => {
+  try {
+    const result = await pool.query(
+      'UPDATE messages SET content = $1, author = $2 WHERE id = $3 RETURNING *',
+      [content, author, id]
+    )
+    return result.rows[0]
+  } catch (error) {
+    throw new Error('Error updating message: ' + error.message)
   }
 }
 
@@ -53,5 +75,6 @@ export const messageModel = {
   getMessageById,
   getRandomMessage,
   createMessage,
+  updateMessage,
   deleteMessage
 }

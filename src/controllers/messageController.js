@@ -5,7 +5,7 @@ const getAllMessages = async (req, res) => {
     const messages = await messageService.getAllMessages()
     res.json(messages)
   } catch (err) {
-    res.status(500).json({ error: 'Internal Server Error' })
+    res.status(500).json({ error: err.message })
   }
 }
 
@@ -31,9 +31,39 @@ const getRandomMessage = async (req, res) => {
 
 const createMessage = async (req, res) => {
   try {
-    const { text } = req.body
-    const newMessage = await messageService.createMessage(text)
+    const { content, author } = req.body
+    const userId = req.user.id
+    if (!userId) {
+      throw new Error('userId is required and must be a valid number')
+    }
+
+    if (!content) {
+      throw new Error('Content is required')
+    }
+    console.log(req.user.id)
+    const newMessage = await messageService.createMessage({ content, author, userId })
+    if (newMessage instanceof Error) {
+      return res.status(400).json({ error: newMessage.message })
+    }
+
     res.status(201).json(newMessage)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
+const updateMessage = async (req, res) => {
+  try {
+    const { id, content, author } = req.body
+    if (!id) {
+      throw new Error('ID is required')
+    }
+    const updatedMessage = await messageService.updateMessage({ id, content, author })
+    if (updatedMessage instanceof Error) {
+      return res.status(400).json({ error: updatedMessage.message })
+    }
+
+    res.json(updatedMessage)
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -43,9 +73,10 @@ const deleteMessage = async (req, res) => {
   try {
     const { id } = req.params
     await messageService.deleteMessage(id)
+
     res.json({ message: 'Message deleted successfully' })
   } catch (err) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: err.message })
   }
 }
 
@@ -54,5 +85,6 @@ export const messageController = {
   getMessageById,
   getRandomMessage,
   createMessage,
+  updateMessage,
   deleteMessage
 }

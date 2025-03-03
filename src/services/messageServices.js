@@ -27,12 +27,22 @@ const getRandomMessage = async () => {
   }
 }
 
-const createMessage = async ({ content, tag }) => {
+const createMessage = async ({ content, author, userId }) => {
   try {
-    const result = await messageModel.createMessage({ content, tag })
+    console.log(userId)
+    const result = await messageModel.createMessage({ content, author, userId })
     return result
   } catch (error) {
     throw new Error('Failed to create message: ' + error.message)
+  }
+}
+
+const updateMessage = async ({ id, content, author }) => {
+  try {
+    const result = await messageModel.updateMessage({ id, content, author })
+    return result
+  } catch (error) {
+    throw new Error('Failed to update message: ' + error.message)
   }
 }
 
@@ -50,5 +60,6 @@ export const messageService = {
   getMessageById,
   getRandomMessage,
   createMessage,
+  updateMessage,
   deleteMessage
 }
